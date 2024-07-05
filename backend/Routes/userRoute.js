@@ -112,7 +112,7 @@ const updatebody=zod.object({
 })
 
 router.put("/update",authMiddleWares,async function(req,res){
-    // update a user
+    // update a user information 
     const body=req.body;
     const okreport=updatebody.safeParse(body);
     if(!okreport.success){
@@ -121,6 +121,7 @@ router.put("/update",authMiddleWares,async function(req,res){
         })
     }
 
+    // this is how we update thing on the database .
     await Users.updateOne(body,{
         id: req.userId
     })
@@ -128,6 +129,38 @@ router.put("/update",authMiddleWares,async function(req,res){
     res.json({
         message: "User updated"
     })
+
+})
+
+router.get("/bulk",authMiddleWares,async function(req,res){
+
+    // This is needed so users can search for their friends and send them money.
+    const filter=req.query.filter || "";
+
+    const filtered=await Users.find({
+        $or:[
+            // why regex?  because we want to search for the name of the user.it can also search sub string in the string . this type of query is know as like query.
+            {firstname:{"$regex":filter}},{lastname:{"$regex":filter}}
+        ]
+
+    })
+
+    res.json({
+        user:filtered.map((val)=>{
+            return {
+                username:val.username,
+                firstname:val.firstname,
+                lastname:val.lastname,
+                _id:val._id,
+            }
+        })
+
+    })
+
+
+
+
+
 
 })
 
