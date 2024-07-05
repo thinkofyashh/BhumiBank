@@ -1,1 +1,2 @@
-BhumiBank stands as a beacon of trust and reliability in the digital financial world, ensuring that your money is always in safe hands. Whether you're making a payment, transferring funds, or managing your savings, BhumiBank is here to provide a seamless and secure experience.
+# BhumiBank
+Bhumi means earth or land in Sanskrit, symbolizing stability, reliability, and foundation. BhumiBank conveys the idea of a solid and dependable financial institution rooted in tradition and trust..
