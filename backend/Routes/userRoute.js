@@ -28,7 +28,7 @@ router.post("/signup",async function(req,res){
     }
 
     // checking for existing user 
-    
+
     const existingUser=await Users.findone(
         {username:body.username}
     )
@@ -59,9 +59,49 @@ router.post("/signup",async function(req,res){
 
 
 })
+// zod schema for signin 
 
-router.post("/signin",function(req,res){
+const signinBody=zod.object({
+    username:zod.string().email(),
+    password:zod.string().min(6),
+});
+
+router.post("/signin",async function(req,res){
     // sign in a user
+    const body=req.body;
+
+    // input vaildation 
+
+    const okreport=signinBody.safeParse(body);
+    if(!okreport.success){
+        res.json({
+            message: "Incorrect inputs"
+        })
+    }
+
+    // finding if you the user exist or not in the database
+
+    const existingUser=await Users.findone({
+        username:body.username
+    })
+
+    // if user doesnt exist it will be returned back.
+    if(!existingUser){
+        res.json({
+            message: "User not found"
+        })
+    }
+
+    // if exist then signing the jwt token
+    const jwtToken=jwt.sign({userId:existingUser._id},JWT_SECRET)
+
+    // sending back the response with token 
+
+    res.json({
+        message: "User signed in",
+        token:jwtToken
+    })
+    
 })
 
 router.post("/update",function(req,res){
