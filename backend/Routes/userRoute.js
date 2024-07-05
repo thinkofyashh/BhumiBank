@@ -1,10 +1,63 @@
 const express=require("express")
 const router=express.Router()
+const zod=require("zod")
+const { Users } = require("../DB/indexx")
+const jwt=require("jsonwebtoken")
+const { JWT_SECRET } = require("../config")
 
 //user Routes
 
-router.post("/signup",function(req,res){
-    // create a new user 
+const signupBody=zod.object({
+    username:zod.string().email(),
+    firstname:zod.string(),
+    lastname:zod.string(),
+    password:zod.string().min(6),
+})
+
+router.post("/signup",async function(req,res){
+    // create a new user
+    const body=req.body;
+
+    // validating inputs 
+
+    const okreport=signupBody.safeParse(body);
+    if(!okreport.success){
+        res.json({
+            message: "Incorrect inputs"
+        })
+    }
+
+    // checking for existing user 
+    
+    const existingUser=await Users.findone(
+        {username:body.username}
+    )
+
+    // checking if the existing user id is present or not .if yes then sending user message that user already exists .
+
+    if(existingUser._id){
+        res.json({
+            message: "User already exists"
+        })
+    }
+
+    // after checking all the checks . we creating a user in the database .
+
+    const newUser=await Users.create(body)
+
+    // generating jwt token for the user. using the id of the newUser created .
+
+    const jwtToken=jwt.sign({userId:newUser._id},JWT_SECRET)
+  
+
+    res.json({
+        message: "User created",
+        token:jwtToken
+    })
+
+    
+
+
 })
 
 router.post("/signin",function(req,res){
