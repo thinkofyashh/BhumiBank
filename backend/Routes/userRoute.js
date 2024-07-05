@@ -4,6 +4,7 @@ const zod=require("zod")
 const { Users } = require("../DB/indexx")
 const jwt=require("jsonwebtoken")
 const { JWT_SECRET } = require("../config")
+const authMiddleWares = require("../MiddleWares/middleware")
 
 //user Routes
 
@@ -104,8 +105,30 @@ router.post("/signin",async function(req,res){
     
 })
 
-router.post("/update",function(req,res){
+const updatebody=zod.object({
+    firstname:zod.string().optional(),
+    lastname:zod.string().optional(),
+    password:zod.string().min(6).optional()
+})
+
+router.put("/update",authMiddleWares,async function(req,res){
     // update a user
+    const body=req.body;
+    const okreport=updatebody.safeParse(body);
+    if(!okreport.success){
+        res.json({
+            message: "Incorrect inputs"
+        })
+    }
+
+    await Users.updateOne(body,{
+        id: req.userId
+    })
+
+    res.json({
+        message: "User updated"
+    })
+
 })
 
 
