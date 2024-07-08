@@ -3,7 +3,7 @@ const { string, Schema } = require("zod")
 
 mongoose.connect("mongodb+srv://thinkofyash:18NovMonday@cluster0.xay1cqj.mongodb.net/BhumiBank")
 
-const UserSchema=mongoose.Schema({
+const UserSchema=new mongoose.Schema({
     username:String,
     firstname:String,
     lastname:String,
@@ -15,7 +15,7 @@ const UserSchema=mongoose.Schema({
 
 const User=mongoose.model("Users",UserSchema)
 
-const AccountSchema=mongoose.Schema({
+const AccountSchema=new mongoose.Schema({
     userId:{type:mongoose.Schema.Types.ObjectId,ref:"User",required:true},
     balance:{
         type:Number,

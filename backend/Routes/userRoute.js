@@ -1,7 +1,7 @@
 const express=require("express")
 const router=express.Router()
 const zod=require("zod")
-const { Users } = require("../DB/indexx")
+const { Users, Accounts } = require("../DB/indexx")
 const jwt=require("jsonwebtoken")
 const { JWT_SECRET } = require("../config")
 const authMiddleWares = require("../MiddleWares/middleware")
@@ -45,6 +45,15 @@ router.post("/signup",async function(req,res){
     // after checking all the checks . we creating a user in the database .
 
     const newUser=await Users.create(body)
+
+    const userid=newUser._id
+
+    // assigning random bank balance to the user created between 1 to 10000. 
+
+    await Accounts.create({
+        userId:userid,
+        balance:1+Math.random()*10000
+    })
 
     // generating jwt token for the user. using the id of the newUser created .
 
