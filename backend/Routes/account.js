@@ -1,7 +1,9 @@
 const express=require("express");
 const zod=require("zod")
+
 const authMiddleWares = require("../MiddleWares/middleware");
 const { Accounts } = require("../DB/indexx");
+const { default: mongoose } = require("mongoose");
 const router=express.Router();
 
 
@@ -20,6 +22,12 @@ const transferBody=zod.object({
     amount:zod.number().min(1).max(10000)
 })
 router.post("/transfer",authMiddleWares,async function(req,res){
+
+    const session=await mongoose.startSession();
+
+    session.startTransaction()
+
+
     const body=req.body
 
     // checking if the user is sending me the right information if he/she want to send the money.
@@ -35,11 +43,12 @@ router.post("/transfer",authMiddleWares,async function(req,res){
 
     const senderAccount=await Accounts.findOne({
         userId:req.userId
-    })
+    }).session(session)
 
 // checking if the sender has amount greater than which he/she sending if not the case returning .
 
-    if(senderAccount.amount<body.amount){
+    if(!senderAccount || senderAccount.amount<body.amount){
+        await session.abortTransaction()
         res.json({
             msg:"Insufficient Balance"
 
@@ -49,11 +58,12 @@ router.post("/transfer",authMiddleWares,async function(req,res){
 
     const toAccount=await Accounts.findOne({
         userid:body.to
-    })
+    }).session(session)
 
 // checking if the account exist or not .
 
     if(!toAccount){
+        await session.abortTransaction()
         res.json({
             msg:"Invalid Account"
         })
@@ -61,19 +71,21 @@ router.post("/transfer",authMiddleWares,async function(req,res){
 
 // updating the sender balance with new balance 
 
-    await Accounts.updateOne({userId:req.userId},{"$inc":{balance:-amount}})
+    await Accounts.updateOne({userId:req.userId},{"$inc":{balance:-amount}}).session(session)
 
 // updating the account with updated value.
 
-    await Accounts.updateOne({userId:body.to},{"$inc":{balance:amount}})
+    await Accounts.updateOne({userId:body.to},{"$inc":{balance:amount}}).session(session)
 
 // if all done returning the message .
+await session.commitTransaction()
 
     res.json({
         msg:"Transfer Successful"
     })
 
 })
+
 
 
 
