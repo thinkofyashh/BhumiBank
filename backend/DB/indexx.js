@@ -1,5 +1,5 @@
 const mongoose=require("mongoose")
-const { string } = require("zod")
+const { string, Schema } = require("zod")
 
 mongoose.connect("mongodb+srv://thinkofyash:18NovMonday@cluster0.xay1cqj.mongodb.net/BhumiBank")
 
@@ -10,8 +10,22 @@ const UserSchema=mongoose.Schema({
     password:String
 })
 
+
+
+
 const User=mongoose.model("Users",UserSchema)
 
+const AccountSchema=mongoose.Schema({
+    userId:{type:mongoose.Schema.Types.ObjectId,ref:"User",required:true},
+    balance:{
+        type:Number,
+        required:true
+    }
+})
+
+const Account=mongoose.model("Accounts",AccountSchema)
+
 module.exports={
-    Users:User
+    Users:User,
+    Accounts:Account
 }
