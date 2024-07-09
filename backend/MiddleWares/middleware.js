@@ -5,9 +5,9 @@ const { JWT_SECRET } = require("../config");
 
 
 function authMiddleWares(req,res,next){
-    const token=req.headers.Authorization
+    const token=req.headers.authorization
     if(!token || !token.startsWith("Bearer ")){
-        res.json({
+        return res.json({
             status:false,
         })
     }
@@ -22,7 +22,7 @@ function authMiddleWares(req,res,next){
     }
 
     }catch(err){
-        res.status(401).json({message:"unauthorized"})
+       return res.status(401).json({message:"unauthorized"})
     }
 
     

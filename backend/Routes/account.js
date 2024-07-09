@@ -7,12 +7,21 @@ const { default: mongoose } = require("mongoose");
 const router=express.Router();
 
 
+/*
+
+postman
+{
+    "username":"yash1@gmail.com"
+    
+}
+
+*/
 router.get("/balance",authMiddleWares,async function(req,res){
     const userid=req.userid
     const account=await Accounts.findOne({
         userid:userid
     })
-    res.json({
+   return res.json({
         balance:account.balance
     })
 })
@@ -21,11 +30,15 @@ const transferBody=zod.object({
     to:zod.string(),
     amount:zod.number().min(1).max(10000)
 })
+/*
+
+
+*/
 router.post("/transfer",authMiddleWares,async function(req,res){
 
     const session=await mongoose.startSession();
 
-    session.startTransaction()
+     session.startTransaction();
 
 
     const body=req.body
@@ -34,7 +47,7 @@ router.post("/transfer",authMiddleWares,async function(req,res){
 
     const okreport=transferBody.safeParse(body)
     if(!okreport){
-        res.json({
+        return res.json({
             msg:"Invalid Request"
         })
     }
@@ -44,12 +57,12 @@ router.post("/transfer",authMiddleWares,async function(req,res){
     const senderAccount=await Accounts.findOne({
         userId:req.userId
     }).session(session)
-
+console.log(req.userId)
 // checking if the sender has amount greater than which he/she sending if not the case returning .
 
     if(!senderAccount || senderAccount.amount<body.amount){
         await session.abortTransaction()
-        res.json({
+       return res.json({
             msg:"Insufficient Balance"
 
         })
@@ -59,28 +72,28 @@ router.post("/transfer",authMiddleWares,async function(req,res){
     const toAccount=await Accounts.findOne({
         userid:body.to
     }).session(session)
-
+console.log(body.to)
 // checking if the account exist or not .
 
     if(!toAccount){
         await session.abortTransaction()
-        res.json({
+       return  res.json({
             msg:"Invalid Account"
         })
     }
 
 // updating the sender balance with new balance 
 
-    await Accounts.updateOne({userId:req.userId},{"$inc":{balance:-amount}}).session(session)
+    await Accounts.updateOne({userId:req.userId},{"$inc":{balance:-body.amount}}).session(session)
 
 // updating the account with updated value.
 
-    await Accounts.updateOne({userId:body.to},{"$inc":{balance:amount}}).session(session)
+    await Accounts.updateOne({userId:body.to},{"$inc":{balance:body.amount}}).session(session)
 
 // if all done returning the message .
 await session.commitTransaction()
 
-    res.json({
+   return res.json({
         msg:"Transfer Successful"
     })
 

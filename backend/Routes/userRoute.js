@@ -15,6 +15,18 @@ const signupBody=zod.object({
     password:zod.string().min(6),
 })
 
+/*
+
+// postman
+{
+    "username":"yash@gmail.com",
+    "firstname":"yash",
+    "lastname":"rawat",
+    "password":"123456"
+}
+
+
+*/
 router.post("/signup",async function(req,res){
     // create a new user
     const body=req.body;
@@ -23,21 +35,21 @@ router.post("/signup",async function(req,res){
 
     const okreport=signupBody.safeParse(body);
     if(!okreport.success){
-        res.json({
+        return res.json({
             message: "Incorrect inputs"
         })
     }
 
     // checking for existing user 
 
-    const existingUser=await Users.findone(
+    const existingUser=await Users.findOne(
         {username:body.username}
     )
 
     // checking if the existing user id is present or not .if yes then sending user message that user already exists .
 
-    if(existingUser._id){
-        res.json({
+    if(existingUser){
+        return res.json({
             message: "User already exists"
         })
     }
@@ -60,7 +72,7 @@ router.post("/signup",async function(req,res){
     const jwtToken=jwt.sign({userId:newUser._id},JWT_SECRET)
   
 
-    res.json({
+   return  res.json({
         message: "User created",
         token:jwtToken
     })
@@ -76,6 +88,17 @@ const signinBody=zod.object({
     password:zod.string().min(6),
 });
 
+/*
+postman
+{
+    "username":"yash@gmail.com",
+    "password":"123456"
+}
+
+
+*/
+
+
 router.post("/signin",async function(req,res){
     // sign in a user
     const body=req.body;
@@ -84,20 +107,21 @@ router.post("/signin",async function(req,res){
 
     const okreport=signinBody.safeParse(body);
     if(!okreport.success){
-        res.json({
+        return res.json({
             message: "Incorrect inputs"
         })
     }
 
     // finding if you the user exist or not in the database
 
-    const existingUser=await Users.findone({
-        username:body.username
+    const existingUser=await Users.findOne({
+        username:body.username,
+        password:body.password
     })
 
     // if user doesnt exist it will be returned back.
     if(!existingUser){
-        res.json({
+       return res.json({
             message: "User not found"
         })
     }
@@ -107,7 +131,7 @@ router.post("/signin",async function(req,res){
 
     // sending back the response with token 
 
-    res.json({
+    return res.json({
         message: "User signed in",
         token:jwtToken
     })
@@ -125,17 +149,17 @@ router.put("/update",authMiddleWares,async function(req,res){
     const body=req.body;
     const okreport=updatebody.safeParse(body);
     if(!okreport.success){
-        res.json({
+       return res.json({
             message: "Incorrect inputs"
         })
     }
 
     // this is how we update thing on the database .
-    await Users.updateOne(body,{
-        id: req.userId
+    await Users.updateOne({_id:req.userId},{
+        "$set":body
     })
 
-    res.json({
+    return res.json({
         message: "User updated"
     })
 
