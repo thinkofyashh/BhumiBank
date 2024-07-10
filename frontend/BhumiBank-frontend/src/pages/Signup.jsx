@@ -28,7 +28,7 @@ export function Signup(){
                             await axios.post("http://localhost:3000/api/v1/user/signup",{
                                 username:email,
                                 firstname:firstName,
-                                lastName:lastName,
+                                lastname:lastName,
                                 password:password
                             })
                         }}></Button>
