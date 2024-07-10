@@ -1,33 +1,7 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Button } from "./Button"
+import axios from "axios"
 
-export function Users(){
-    const [Users,setUser]=useState([{
-        firstName:"Yash",
-        lastname:"Rawat",
-        _id:1
-    }])
-    return (
-       <div className="justify-start">
-        <div className="font-bold flex flex-col justify-center px-4 py-4 ">
-            Users
-        </div>
-        <input className="border-gray-400 w-full h-10 rounded-md  shadow-slate-400 shadow-inner px-2" placeholder="Search for user..." type="text"></input>
-        <div>
-            {Users.map((user)=>{
-                return(
-                    <User user={user}></User>
-
-                )
-            })}
-
-
-        </div>
-
-
-       </div>
-    )
-}
 function User({user}){
     return(
         <div className="flex justify-between py-4 px-2">
@@ -50,4 +24,36 @@ function User({user}){
         </div>
     )
 
+}
+export function Users(){
+    const [Users,setUser]=useState([])
+    useEffect( ()=>{
+         axios.get("http://localhost:3000/api/v1/user/bulk").then((res)=>{
+            if(Array.isArray(res.data.user)){
+                setUser(res.data.user)
+            }else{
+                console.log("Not responding")
+            }
+        })
+    },[])
+    return (
+       <div className="justify-start"> 
+        <div className="font-bold flex flex-col justify-center px-4 py-4 ">
+            Users
+        </div>
+        <input className="border-gray-400 w-full h-10 rounded-md  shadow-slate-400 shadow-inner px-2" placeholder="Search for user..." type="text"></input>
+        <div>
+            {Users.map((user)=>{
+                return(
+                    <User user={user}></User>
+
+                )
+            })}
+
+
+        </div>
+
+
+       </div>
+    )
 }
