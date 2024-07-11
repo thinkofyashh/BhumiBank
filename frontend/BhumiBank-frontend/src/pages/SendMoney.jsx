@@ -1,6 +1,10 @@
+import { useSearchParams } from "react-router-dom";
 import { Heading } from "../components/Heading";
 
 export function SendMoney(){
+    const [searchparam]=useSearchParams()
+    const id=searchparam.get("id")
+    const name =searchparam.get("name")
     return (
         <div className="bg-gray-600 h-screen flex justify-center">
             <div className="h-full flex flex-col justify-center">
@@ -9,10 +13,10 @@ export function SendMoney(){
                 <div className="flex">
                     <div className="rounded-full flex flex-col justify-center bg-green-400 w-12 h-12 ml-8">
                         <div className="flex flex-col justify-center">
-                            A
+                            {name[0].toUpperCase()}
                         </div>
                     </div>
-                    <div className="font-semibold ml-4 flex flex-col justify-center text-2xl">Friend's Name</div>
+                    <div className="font-semibold ml-4 flex flex-col justify-center text-2xl">{name}</div>
 
                 </div>
                 <div className="font-medium pt-2 pb-2">
