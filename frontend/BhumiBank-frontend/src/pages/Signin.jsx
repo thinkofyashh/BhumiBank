@@ -5,10 +5,12 @@ import { Heading } from "../components/Heading";
 import { InputBox } from "../components/InputBox";
 import { SubHeading } from "../components/SubHeading";
 import axios from "axios"
+import { useNavigate } from "react-router-dom";
 
 export function Signin(){
     const [username,setusername]=useState("")
     const [password,setPassword]=useState("")
+    const navigate = useNavigate()
     return(
         <div className="bg-slate-500 h-screen flex justify-center items-center ">
             <div className="flex flex-col justify-center ">
@@ -20,12 +22,13 @@ export function Signin(){
                     }} label={"Email"} placeholder={"yashrawat@gmail.com"}></InputBox>
                     <InputBox onChange={(e)=>{setPassword(e.target.value)}} label={"Password"} placeholder={"Enter your password"}></InputBox>
                     <div className="pt-4">
-                        <Button onClick={(e)=>{
-                           const res= axios.post("http://localhost:3000/api/v1/user/signin",{
+                        <Button onClick={async(e)=>{
+                           const res= await axios.post("http://localhost:3000/api/v1/user/signin",{
                                 username,
                                 password
                             },)
                             localStorage.setItem("token",res.data.token)
+                            navigate("/dashboard")
 
                         }} label={"Sign in"}></Button>
                     
