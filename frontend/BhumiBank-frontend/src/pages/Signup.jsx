@@ -5,12 +5,14 @@ import { Heading } from "../components/Heading";
 import { InputBox } from "../components/InputBox";
 import { SubHeading } from "../components/SubHeading";
 import axios from "axios"
+import { useNavigate } from "react-router-dom";
 
 export function Signup(){
     const [firstName,setFirstName]=useState("")
     const [lastName,setLastName]=useState("")
     const [email,setEmail]=useState("")
     const [password,setPassword]=useState("")
+    const navigate =useNavigate()
     return(
         <>
 
@@ -32,6 +34,8 @@ export function Signup(){
                                 password:password
                             })
                             localStorage.setItem("token",response.data.token)
+                            navigate("/dashboard")
+
                         }}></Button>
                     </div>
                     <BottomWarning label={"Already have an account ?"} buttontext={"Log in"} to={"/signin"}></BottomWarning>
