@@ -20,8 +20,10 @@ router.get("/balance",authMiddleWares,async function(req,res){
     const userid=req.userId;
     console.log(userid)
     const account=await Accounts.findOne({
-        userid:userid
+        userId:userid
     })
+    console.log(account)
+    console.log(account.balance)
    return res.json({
         balance:account.balance
     })
